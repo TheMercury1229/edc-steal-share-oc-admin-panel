@@ -1,5 +1,4 @@
 "use client";
-
 import * as React from "react";
 import {
   ColumnDef,
@@ -34,94 +33,121 @@ export type Player = {
   points: number;
 };
 
-const data: Player[] = [
-  { id: "p1", points: 100 },
-  { id: "p2", points: 150 },
-  { id: "p3", points: 120 },
-  { id: "p4", points: 90 },
-  { id: "p5", points: 130 },
-  { id: "p6", points: 110 },
-  { id: "p7", points: 80 },
-  { id: "p8", points: 170 },
-  { id: "p9", points: 160 },
-  { id: "p10", points: 140 },
-  { id: "p11", points: 180 },
-  { id: "p12", points: 190 },
-  { id: "p13", points: 200 },
-  { id: "p14", points: 210 },
-  { id: "p15", points: 220 },
-  { id: "p16", points: 230 },
-];
+const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
 
-export const columns: ColumnDef<Player>[] = [
-  {
-    accessorKey: "id",
-    header: "Player ID",
-    cell: ({ row }) => <div>{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "points",
-    header: () => <div className="text-right">Points</div>,
-    cell: ({ row }) => (
-      <div className="text-right font-medium">{row.getValue("points")}</div>
-    ),
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const player = row.original;
-      const [newPoints, setNewPoints] = React.useState(player.points);
-      const [dialogOpen, setDialogOpen] = React.useState(false);
-
-      return (
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline">Update Points</Button>
-          </DialogTrigger>
-          <DialogContent className="text-center">
-            <DialogHeader>
-              <DialogTitle>Update Points for {player.id}</DialogTitle>
-            </DialogHeader>
-            <DialogDescription className="flex flex-col gap-4 items-center">
-              Enter the new points for Player {player.id}:
-              <Input
-                type="number"
-                value={newPoints}
-                onChange={(e) => setNewPoints(Number(e.target.value))}
-                placeholder="Enter new points"
-              />
-              <Button
-                variant="default"
-                onClick={() => {
-                  player.points = newPoints;
-                  console.log(
-                    `Updated points for Player ${player.id}: ${newPoints}`
-                  );
-                  setDialogOpen(false);
-                }}
-              >
-                Save
-              </Button>
-            </DialogDescription>
-          </DialogContent>
-        </Dialog>
-      );
-    },
-  },
-];
-
-export default function PlayerTable() {
+export default function PlayersPage() {
+  const [players, setPlayers] = React.useState<Player[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [currentPage, setCurrentPage] = React.useState(0);
   const rowsPerPage = 10;
 
+  // Fetch players from the backend
+  const fetchPlayers = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/get-all-players`, {
+        credentials: "include", // Include credentials (JWT token)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPlayers(data.players); // Assumes the response has a `players` array
+      } else {
+        console.error("Failed to fetch players");
+      }
+    } catch (error) {
+      console.error("Error fetching players:", error);
+    }
+  };
+  //Update player points
+  const updatePlayerPoints = async (
+    playerId: Player,
+    newPoints: number,
+    e: any
+  ) => {
+    e.preventDefault();
+    try {
+      await fetch(`${BACKEND_URL}/admin/give-points-to-player`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include JWT token for auth
+        body: JSON.stringify({ points: newPoints, playerID: playerId.id }),
+      });
+      // Update local state after successfully updating points
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((p) =>
+          p.id === playerId.id ? { ...p, points: newPoints } : p
+        )
+      );
+    } catch (error) {
+      console.error("Error updating player points:", error);
+    }
+  };
+  React.useEffect(() => {
+    fetchPlayers();
+  }, []);
+
   const paginatedData = React.useMemo(() => {
     const startIndex = currentPage * rowsPerPage;
-    return data.slice(startIndex, startIndex + rowsPerPage);
-  }, [currentPage]);
+    return players.slice(startIndex, startIndex + rowsPerPage);
+  }, [currentPage, players]);
+
+  const columns: ColumnDef<Player>[] = [
+    {
+      accessorKey: "id",
+      header: "Player ID",
+      cell: ({ row }) => <div>{row.getValue("id")}</div>,
+    },
+    {
+      accessorKey: "points",
+      header: () => <div className="text-right">Points</div>,
+      cell: ({ row }) => (
+        <div className="text-right font-medium">{row.getValue("points")}</div>
+      ),
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const player = row.original;
+        const [newPoints, setNewPoints] = React.useState(player.points);
+        const [dialogOpen, setDialogOpen] = React.useState(false);
+
+        return (
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">Update Points</Button>
+            </DialogTrigger>
+            <DialogContent className="text-center">
+              <DialogHeader>
+                <DialogTitle>Update Points for {player.id}</DialogTitle>
+              </DialogHeader>
+              <DialogDescription className="flex flex-col gap-4 items-center">
+                Enter the new points for Player {player.id}:
+                <Input
+                  type="number"
+                  value={newPoints}
+                  onChange={(e) => setNewPoints(Number(e.target.value))}
+                  placeholder="Enter new points"
+                />
+                <Button
+                  variant="default"
+                  onClick={async (e) => {
+                    await updatePlayerPoints(player, newPoints, e);
+                    setDialogOpen(false);
+                  }}
+                >
+                  Save
+                </Button>
+              </DialogDescription>
+            </DialogContent>
+          </Dialog>
+        );
+      },
+    },
+  ];
 
   const table = useReactTable({
     data: paginatedData,
@@ -180,24 +206,23 @@ export default function PlayerTable() {
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-end space-x-2">
         <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentPage((old) => Math.max(old - 1, 0))}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
           disabled={currentPage === 0}
         >
           Previous
         </Button>
+        <span>Page {currentPage + 1}</span>
         <Button
-          variant="outline"
-          size="sm"
           onClick={() =>
-            setCurrentPage((old) =>
-              Math.min(old + 1, Math.floor(data.length / rowsPerPage))
+            setCurrentPage((prev) =>
+              prev + 1 < Math.ceil(players.length / rowsPerPage)
+                ? prev + 1
+                : prev
             )
           }
-          disabled={currentPage >= Math.floor(data.length / rowsPerPage)}
+          disabled={currentPage + 1 >= Math.ceil(players.length / rowsPerPage)}
         >
           Next
         </Button>

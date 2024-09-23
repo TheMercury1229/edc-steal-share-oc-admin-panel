@@ -5,24 +5,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuthStore } from "../store"; // Import the Zustand store
+import { useAuthStore } from "../store";
 import { useNavigate } from "react-router-dom";
 
-// Mock API function
-const mockAdminLoginApi = (
-  adminId: string,
-  password: string
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (adminId === "admin123" && password === "password123") {
-        resolve("Login Successful");
-      } else {
-        reject("Invalid Admin ID or Password");
-      }
-    }, 1000);
-  });
-};
+const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
 
 export default function Login() {
   const [adminId, setAdminId] = useState("");
@@ -31,27 +17,43 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const { login } = useAuthStore(); // Use Zustand store
+  const { login } = useAuthStore();
 
   const handleLogin = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await mockAdminLoginApi(adminId, password);
-      console.log(response);
-      login(adminId); // Set login state
-      navigate("/");
+      const response = await fetch(`${BACKEND_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // This ensures cookies (including JWT token) are sent/received
+        body: JSON.stringify({ password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.message);
+        const token = adminId; // Get the token from your API response
+        localStorage.setItem("token", token); // Save the token (or adminId here for simplicity)
+        login(adminId);
+        navigate("/");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || "Login failed");
+      }
     } catch (err) {
-      setError(err as string);
+      setError("An error occurred during login");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="max-w-md mx-auto p-6 bg-white rounded-md shadow-md">
+    <div className="flex justify-center items-center min-h-screen w-full">
+      <div className="w-full p-4 bg-white">
         <div className="space-y-4">
           <div>
             <Label htmlFor="adminId">Admin ID</Label>
@@ -61,6 +63,7 @@ export default function Login() {
               onChange={(e) => setAdminId(e.target.value)}
               placeholder="Enter Admin ID"
               disabled={isLoading}
+              className="w-full"
             />
           </div>
 
@@ -73,6 +76,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter Password"
               disabled={isLoading}
+              className="w-full"
             />
           </div>
 
