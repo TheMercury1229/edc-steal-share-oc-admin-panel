@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useAuthStore } from "../store";
 import { useNavigate } from "react-router-dom";
 
-const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+// const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
 
 export default function Login() {
   const [adminId, setAdminId] = useState("");
@@ -19,6 +19,30 @@ export default function Login() {
 
   const { login } = useAuthStore();
 
+  // Hardcoded login function for testing
+  const handleLogin = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    // Simulate successful login without backend interaction
+    const validAdminId = "admin";
+    const validPassword = "password";
+
+    if (adminId === validAdminId && password === validPassword) {
+      console.log("Login successful!");
+      const token = adminId; // Simulating token as adminId for simplicity
+      localStorage.setItem("token", token); // Save the token locally
+      login(adminId); // Update auth store with adminId
+      navigate("/"); // Navigate to home page
+    } else {
+      setError("Invalid Admin ID or Password");
+    }
+
+    setIsLoading(false);
+  };
+
+  // Original login function (commented out)
+  /*
   const handleLogin = async () => {
     setIsLoading(true);
     setError(null);
@@ -50,6 +74,7 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+  */
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full">

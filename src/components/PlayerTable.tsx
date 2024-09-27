@@ -33,17 +33,26 @@ export type Player = {
   points: number;
 };
 
-const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+// Commenting out backend URL and fetch functionality
+// const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
 
 export default function PlayersPage() {
-  const [players, setPlayers] = React.useState<Player[]>([]);
+  // Using hardcoded data for testing
+  const [players, setPlayers] = React.useState<Player[]>([
+    { id: "player1", points: 100 },
+    { id: "player2", points: 150 },
+    { id: "player3", points: 200 },
+    { id: "player4", points: 250 },
+    { id: "player5", points: 300 },
+  ]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [currentPage, setCurrentPage] = React.useState(0);
   const rowsPerPage = 10;
 
-  // Fetch players from the backend
+  // Commenting out the fetchPlayers function
+  /*
   const fetchPlayers = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/admin/get-all-players`, {
@@ -59,35 +68,29 @@ export default function PlayersPage() {
       console.error("Error fetching players:", error);
     }
   };
-  //Update player points
+  */
+
+  // Update player points
   const updatePlayerPoints = async (
     playerId: Player,
     newPoints: number,
     e: any
   ) => {
     e.preventDefault();
-    try {
-      await fetch(`${BACKEND_URL}/admin/give-points-to-player`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Include JWT token for auth
-        body: JSON.stringify({ points: newPoints, playerID: playerId.id }),
-      });
-      // Update local state after successfully updating points
-      setPlayers((prevPlayers) =>
-        prevPlayers.map((p) =>
-          p.id === playerId.id ? { ...p, points: newPoints } : p
-        )
-      );
-    } catch (error) {
-      console.error("Error updating player points:", error);
-    }
+    // Simulating points update in local state for testing
+    setPlayers((prevPlayers) =>
+      prevPlayers.map((p) =>
+        p.id === playerId.id ? { ...p, points: newPoints } : p
+      )
+    );
   };
+
+  // Commenting out useEffect for fetching players
+  /*
   React.useEffect(() => {
     fetchPlayers();
   }, []);
+  */
 
   const paginatedData = React.useMemo(() => {
     const startIndex = currentPage * rowsPerPage;

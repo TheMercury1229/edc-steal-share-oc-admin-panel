@@ -6,7 +6,14 @@ import Login from "./pages/Login";
 // Protect routes based on authentication
 const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
   const { isAuthenticated } = useAuthStore();
+
+  // Original authentication check (commented out)
+  /*
   return isAuthenticated ? element : <Navigate to="/login" />;
+  */
+
+  // Hardcoded authentication for testing
+  return true ? element : <Navigate to="/login" />;
 };
 
 const App = () => {
