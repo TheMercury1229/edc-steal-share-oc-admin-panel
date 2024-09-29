@@ -8,12 +8,11 @@ const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
   const { isAuthenticated } = useAuthStore();
 
   // Original authentication check (commented out)
-  /*
+
   return isAuthenticated ? element : <Navigate to="/login" />;
-  */
 
   // Hardcoded authentication for testing
-  return isAuthenticated ? element : <Navigate to="/login" />;
+  // return isAuthenticated ? element : <Navigate to="/login" />;
 };
 
 const App = () => {
