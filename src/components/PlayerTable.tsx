@@ -1,9 +1,7 @@
-"use client";
 import * as React from "react";
 import {
   ColumnDef,
   SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -33,14 +31,11 @@ export type Player = {
   points: number;
 };
 
-// Uncomment and provide your backend URL here
 const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || "http://localhost:3000";
 
 export default function PlayersPage() {
   const [players, setPlayers] = React.useState<Player[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
   const [currentPage, setCurrentPage] = React.useState(0);
   const rowsPerPage = 10;
 
@@ -61,7 +56,6 @@ export default function PlayersPage() {
     }
   };
 
-  // Update player points
   const updatePlayerPoints = async (
     player: Player,
     newPoints: number,
@@ -78,7 +72,6 @@ export default function PlayersPage() {
         body: JSON.stringify({ points: newPoints, playerID: player.id }),
       });
 
-      // Update local state after successfully updating points
       setPlayers((prevPlayers) =>
         prevPlayers.map((p) =>
           p.id === player.id ? { ...p, points: newPoints } : p
@@ -158,7 +151,7 @@ export default function PlayersPage() {
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    state: { sorting, columnVisibility },
+    state: { sorting },
   });
 
   return (
