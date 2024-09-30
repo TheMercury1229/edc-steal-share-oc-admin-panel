@@ -34,7 +34,7 @@ export type Player = {
 };
 
 // Commenting out backend URL and fetch functionality
-// const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
 
 export default function PlayersPage() {
   // Using hardcoded data for testing
