@@ -33,34 +33,26 @@ export type Player = {
   points: number;
 };
 
-// Commenting out backend URL and fetch functionality
-const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+// Uncomment and provide your backend URL here
+const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || "http://localhost:3000";
 
 export default function PlayersPage() {
-  // Using hardcoded data for testing
-  const [players, setPlayers] = React.useState<Player[]>([
-    // { id: "player1", points: 100 },
-    // { id: "player2", points: 150 },
-    // { id: "player3", points: 200 },
-    // { id: "player4", points: 250 },
-    // { id: "player5", points: 300 },
-  ]);
+  const [players, setPlayers] = React.useState<Player[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [currentPage, setCurrentPage] = React.useState(0);
   const rowsPerPage = 10;
 
-  // Commenting out the fetchPlayers function
-  
+  // Fetching players from the backend
   const fetchPlayers = async () => {
     try {
       const response = await fetch(`${BACKEND_URL}/admin/get-all-players`, {
-        credentials: "include", // Include credentials (JWT token)
+        credentials: "include",
       });
       if (response.ok) {
         const data = await response.json();
-        setPlayers(data.players); // Assumes the response has a `players` array
+        setPlayers(data.players);
       } else {
         console.error("Failed to fetch players");
       }
@@ -68,38 +60,38 @@ export default function PlayersPage() {
       console.error("Error fetching players:", error);
     }
   };
-  
 
   // Update player points
   const updatePlayerPoints = async (
-    playerId: Player,
+    player: Player,
     newPoints: number,
     e: any
   ) => {
     e.preventDefault();
     try {
-      await fetch(${BACKEND_URL}/admin/give-points-to-player-origami, {
+      await fetch(`${BACKEND_URL}/admin/give-points-to-player-origami`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Include JWT token for auth
-        body: JSON.stringify({ points: newPoints, playerID: playerId.id }),
+        credentials: "include",
+        body: JSON.stringify({ points: newPoints, playerID: player.id }),
       });
+
       // Update local state after successfully updating points
       setPlayers((prevPlayers) =>
         prevPlayers.map((p) =>
-          p.id === playerId.id ? { ...p, points: newPoints } : p
+          p.id === player.id ? { ...p, points: newPoints } : p
         )
       );
     } catch (error) {
       console.error("Error updating player points:", error);
     }
   };
+
   React.useEffect(() => {
     fetchPlayers();
   }, []);
-
 
   const paginatedData = React.useMemo(() => {
     const startIndex = currentPage * rowsPerPage;
@@ -229,9 +221,7 @@ export default function PlayersPage() {
         <Button
           onClick={() =>
             setCurrentPage((prev) =>
-              prev + 1 < Math.ceil(players.length / rowsPerPage)
-                ? prev + 1
-                : prev
+              prev + 1 < Math.ceil(players.length / rowsPerPage) ? prev + 1 : prev
             )
           }
           disabled={currentPage + 1 >= Math.ceil(players.length / rowsPerPage)}
