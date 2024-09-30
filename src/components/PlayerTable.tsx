@@ -3,9 +3,10 @@ import * as React from "react";
 import {
   ColumnDef,
   SortingState,
+  VisibilityState,
+  flexRender,
   getCoreRowModel,
   useReactTable,
-  flexRender,
 } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
@@ -32,58 +33,73 @@ export type Player = {
   points: number;
 };
 
+// Commenting out backend URL and fetch functionality
+// const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+
 export default function PlayersPage() {
   // Using hardcoded data for testing
   const [players, setPlayers] = React.useState<Player[]>([
-    { id: "player1", points: 100 },
-    { id: "player2", points: 150 },
-    { id: "player3", points: 200 },
-    { id: "player4", points: 250 },
-    { id: "player5", points: 300 },
-    { id: "player6", points: 100 },
-    { id: "player7", points: 150 },
-    { id: "player8", points: 200 },
-    { id: "player9", points: 250 },
-    { id: "player10", points: 300 },
-    { id: "player11", points: 100 },
-    { id: "player12", points: 150 },
-    { id: "player13", points: 200 },
-    { id: "player14", points: 250 },
-    { id: "player15", points: 300 },
-    { id: "player16", points: 100 },
-    { id: "player17", points: 150 },
-    { id: "player18", points: 200 },
-    { id: "player19", points: 250 },
-    { id: "player20", points: 300 },
-    { id: "player21", points: 100 },
-    { id: "player22", points: 150 },
-    { id: "player23", points: 200 },
-    { id: "player24", points: 250 },
-    { id: "player25", points: 300 },
-    { id: "player26", points: 100 },
-    { id: "player27", points: 150 },
-    { id: "player28", points: 200 },
-    { id: "player29", points: 250 },
-    { id: "player30", points: 300 },
+    // { id: "player1", points: 100 },
+    // { id: "player2", points: 150 },
+    // { id: "player3", points: 200 },
+    // { id: "player4", points: 250 },
+    // { id: "player5", points: 300 },
   ]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [currentPage, setCurrentPage] = React.useState(0);
   const rowsPerPage = 10;
+
+  // Commenting out the fetchPlayers function
+  
+  const fetchPlayers = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/get-all-players`, {
+        credentials: "include", // Include credentials (JWT token)
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPlayers(data.players); // Assumes the response has a `players` array
+      } else {
+        console.error("Failed to fetch players");
+      }
+    } catch (error) {
+      console.error("Error fetching players:", error);
+    }
+  };
+  
 
   // Update player points
   const updatePlayerPoints = async (
     playerId: Player,
     newPoints: number,
-    e: React.MouseEvent
+    e: any
   ) => {
     e.preventDefault();
-    // Simulating points update in local state for testing
-    setPlayers((prevPlayers) =>
-      prevPlayers.map((p) =>
-        p.id === playerId.id ? { ...p, points: newPoints } : p
-      )
-    );
+    try {
+      await fetch(${BACKEND_URL}/admin/give-points-to-player-origami, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include JWT token for auth
+        body: JSON.stringify({ points: newPoints, playerID: playerId.id }),
+      });
+      // Update local state after successfully updating points
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((p) =>
+          p.id === playerId.id ? { ...p, points: newPoints } : p
+        )
+      );
+    } catch (error) {
+      console.error("Error updating player points:", error);
+    }
   };
+  React.useEffect(() => {
+    fetchPlayers();
+  }, []);
+
 
   const paginatedData = React.useMemo(() => {
     const startIndex = currentPage * rowsPerPage;
@@ -150,7 +166,7 @@ export default function PlayersPage() {
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    state: { sorting },
+    state: { sorting, columnVisibility },
   });
 
   return (
