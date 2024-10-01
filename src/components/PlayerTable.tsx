@@ -76,7 +76,7 @@ export default function PlayersPage() {
 
       setPlayers((prevPlayers) =>
         prevPlayers.map((p) =>
-          p.id === player.id ? { ...p, points: newPoints } : p
+          p.id === player.id ? { ...p, points: p.points + newPoints } : p
         )
       );
     } catch (error) {
