@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,15 +43,15 @@ export default function PlayersPage() {
   // Fetching players from the backend
   const fetchPlayers = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/admin/get-all-players`, {
-        credentials: "include",
+      const response = await axios.get(`${BACKEND_URL}/admin/get-all-players`, {
+        headers: {
+          Authorization: localStorage.getItem("token"), // Send the token in the Authorization header
+        },
+        withCredentials: true, // Include cookies if necessary
       });
-      if (response.ok) {
-        const data = await response.json();
-        setPlayers(data.players);
-      } else {
-        console.error("Failed to fetch players");
-      }
+
+      const data = response.data;
+      setPlayers(data.players);
     } catch (error) {
       console.error("Error fetching players:", error);
     }
@@ -214,7 +215,9 @@ export default function PlayersPage() {
         <Button
           onClick={() =>
             setCurrentPage((prev) =>
-              prev + 1 < Math.ceil(players.length / rowsPerPage) ? prev + 1 : prev
+              prev + 1 < Math.ceil(players.length / rowsPerPage)
+                ? prev + 1
+                : prev
             )
           }
           disabled={currentPage + 1 >= Math.ceil(players.length / rowsPerPage)}
