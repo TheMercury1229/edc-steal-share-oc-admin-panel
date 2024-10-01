@@ -14,7 +14,6 @@ const ProtectedRoute = ({ element }: { element: JSX.Element }) => {
   // Hardcoded authentication for testing
   // return isAuthenticated ? element : <Navigate to="/login" />;
 };
-
 const App = () => {
   return (
     <main className="min-h-screen bg-gray-100">
