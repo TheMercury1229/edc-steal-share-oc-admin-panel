@@ -64,8 +64,7 @@ export default function PlayersPage() {
   ) => {
     e.preventDefault();
     try {
-      await axios.post(`${BACKEND_URL}/admin/give-points-to-player`, {
-        method: "PUT",
+      await axios.put(`${BACKEND_URL}/admin/give-points-to-player`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `${localStorage.getItem("token")}`, // Send the token in the Authorization header
