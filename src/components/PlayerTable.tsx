@@ -31,7 +31,7 @@ export type Player = {
   points: number;
 };
 
-const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL || "https://edc-pict.site";
+const BACKEND_URL = "https://edc-pict.site";
 
 export default function PlayersPage() {
   const [players, setPlayers] = React.useState<Player[]>([]);
