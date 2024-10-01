@@ -79,18 +79,6 @@ export default function Login() {
       <div className="w-full p-4 bg-white">
         <div className="space-y-4">
           <div>
-            <Label htmlFor="adminId">Admin ID</Label>
-            <Input
-              id="adminId"
-              value={adminId}
-              onChange={(e) => setAdminId(e.target.value)}
-              placeholder="Enter Admin ID"
-              disabled={isLoading}
-              className="w-full"
-            />
-          </div>
-
-          <div>
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
