@@ -59,7 +59,7 @@ export default function Login() {
       if (response.ok) {
         const data = await response.json();
         console.log(data.message);
-        const token = adminId; // Get the token from your API response
+        const token = data.token; // Get the token from your API response
         localStorage.setItem("token", token); // Save the token (or adminId here for simplicity)
         login(token);
         navigate("/");
