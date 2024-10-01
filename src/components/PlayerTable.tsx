@@ -45,7 +45,7 @@ export default function PlayersPage() {
     try {
       const response = await axios.get(`${BACKEND_URL}/admin/get-all-players`, {
         headers: {
-          token: localStorage.getItem("token"), // Send the token in the Authorization header
+          Authorization: `${localStorage.getItem("token")}`, // Send the token in the Authorization header
         },
         withCredentials: true, // Include cookies if necessary
       });
