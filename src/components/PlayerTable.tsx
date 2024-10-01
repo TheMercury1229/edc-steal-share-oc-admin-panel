@@ -64,15 +64,19 @@ export default function PlayersPage() {
   ) => {
     e.preventDefault();
     try {
-      await axios.put(`${BACKEND_URL}/admin/give-points-to-player`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${localStorage.getItem("token")}`, // Send the token in the Authorization header
-        },
-        withCredentials: true, // Include cookies if necessary
-        body: JSON.stringify({ points: newPoints, playerID: player.id }),
-      });
+      await axios.put(
+        `${BACKEND_URL}/admin/give-points-to-player`,
+        { points: newPoints, playerID: player.id }, // This is the body
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${localStorage.getItem("token")}`, // Ensure token is sent correctly
+          },
+          withCredentials: true, // Include cookies if necessary
+        }
+      );
 
+      // Update the player's points locally in the state
       setPlayers((prevPlayers) =>
         prevPlayers.map((p) =>
           p.id === player.id ? { ...p, points: p.points + newPoints } : p
