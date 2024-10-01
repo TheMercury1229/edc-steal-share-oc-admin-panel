@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 const BACKEND_URL = "https://edc-pict.site";
 
 export default function Login() {
-  const [adminId, setAdminId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
