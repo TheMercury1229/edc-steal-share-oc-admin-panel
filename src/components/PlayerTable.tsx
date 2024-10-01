@@ -64,10 +64,11 @@ export default function PlayersPage() {
   ) => {
     e.preventDefault();
     try {
-      await fetch(`${BACKEND_URL}/admin/give-points-to-player-origami`, {
+      await fetch(`${BACKEND_URL}/admin/give-points-to-player`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("token")}`,
         },
         credentials: "include",
         body: JSON.stringify({ points: newPoints, playerID: player.id }),
