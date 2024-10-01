@@ -64,13 +64,13 @@ export default function PlayersPage() {
   ) => {
     e.preventDefault();
     try {
-      await fetch(`${BACKEND_URL}/admin/give-points-to-player`, {
+      await axios.post(`${BACKEND_URL}/admin/give-points-to-player`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${localStorage.getItem("token")}`,
+          Authorization: `${localStorage.getItem("token")}`, // Send the token in the Authorization header
         },
-        credentials: "include",
+        withCredentials: true, // Include cookies if necessary
         body: JSON.stringify({ points: newPoints, playerID: player.id }),
       });
 
