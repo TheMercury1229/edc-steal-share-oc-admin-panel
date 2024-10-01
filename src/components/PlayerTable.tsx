@@ -43,7 +43,7 @@ export default function PlayersPage() {
   // Fetching players from the backend
   const fetchPlayers = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/admin/get-all-players`, {
+      const response = await axios.get(`${BACKEND_URL}/oc/get-all-players`, {
         headers: {
           Authorization: `${localStorage.getItem("token")}`, // Send the token in the Authorization header
         },
@@ -65,7 +65,7 @@ export default function PlayersPage() {
     e.preventDefault();
     try {
       await axios.put(
-        `${BACKEND_URL}/admin/give-points-to-player`,
+        `${BACKEND_URL}/oc/give-points-to-player`,
         { points: newPoints, playerID: player.id }, // This is the body
         {
           headers: {
@@ -114,7 +114,7 @@ export default function PlayersPage() {
       enableHiding: false,
       cell: ({ row }) => {
         const player = row.original;
-        const [newPoints, setNewPoints] = React.useState(player.points);
+        const [newPoints, setNewPoints] = React.useState<string>(""); // Initialize as an empty string
         const [dialogOpen, setDialogOpen] = React.useState(false);
 
         return (
@@ -127,19 +127,21 @@ export default function PlayersPage() {
                 <DialogTitle>Update Points for {player.id}</DialogTitle>
               </DialogHeader>
               <DialogDescription className="flex flex-col gap-4 items-center">
-                Enter the new points for Player {player.id}:
+                Enter the point increment for Player {player.id}:
                 <Input
                   type="number"
-                  value={newPoints}
-                  onChange={(e) => setNewPoints(Number(e.target.value))}
-                  placeholder="Enter new points"
+                  value={newPoints} // Show the new points value or empty if none
+                  onChange={(e) => setNewPoints(e.target.value)} // Update based on input
+                  placeholder="Enter point increment"
                 />
                 <Button
                   variant="default"
                   onClick={async (e) => {
-                    await updatePlayerPoints(player, newPoints, e);
+                    await updatePlayerPoints(player, Number(newPoints), e); // Convert to number
                     setDialogOpen(false);
+                    setNewPoints(""); // Reset input after submission
                   }}
+                  disabled={newPoints === ""} // Disable button if no points entered
                 >
                   Save
                 </Button>
