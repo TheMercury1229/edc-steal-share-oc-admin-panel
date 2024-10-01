@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useAuthStore } from "../store";
 import { useNavigate } from "react-router-dom";
 
-const BACKEND_URL = import.meta.env.VITE_REACT_APP_BACKEND_URL;
+const BACKEND_URL = "https://edc-pict.site";
 
 export default function Login() {
   const [adminId, setAdminId] = useState("");
